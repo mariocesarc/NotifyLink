@@ -1,6 +1,7 @@
 from colorfield.fields import ColorField
 from django.conf import settings
 from django.db import models
+from django.templatetags.static import static
 
 
 class PageTheme(models.Model):
@@ -42,6 +43,10 @@ class Link(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    @property
+    def icon_url(self):
+        return static('icons/{}_icon.png'.format(self.type))
 
     def __str__(self):
         return '{} - {}'.format(self.user.username, self.name)
