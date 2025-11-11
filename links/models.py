@@ -24,8 +24,15 @@ class PageTheme(models.Model):
         ROUNDED = '16px', 'Rounded (16px)'
         PILL = '999px', 'Pill (fully rounded)'
 
+    class LinkHeight(models.TextChoices):
+        SMALL = 'p-2', 'Small'
+        NORMAL = 'p-4', 'Normal'
+        TALL = 'p-6', 'Tall'
+
+
     name = models.CharField(max_length=50, unique=True)
 
+    blur_behind_bio = models.BooleanField(default=True)
     background_image = models.ImageField(upload_to='backgrounds/', blank=True, null=True)
     background_color = ColorField(default='#000000')
     avatar_outline_color = ColorField(default='#404040')
@@ -33,6 +40,7 @@ class PageTheme(models.Model):
     font_family = models.CharField(max_length=64, choices=FontFamily.choices, default=FontFamily.POPPINS)
 
     # links
+    link_height = models.CharField(max_length=64, choices=LinkHeight.choices, default=LinkHeight.NORMAL)
     link_roundness = models.CharField(max_length=64, choices=BorderRadius.choices, default=BorderRadius.PILL)
     link_background_color = ColorField(default='#808080')
     link_outline_color = ColorField(default='#404040')
@@ -52,6 +60,7 @@ class Link(models.Model):
         FACEBOOK = 'facebook', 'Facebook'
         YOUTUBE = 'youtube', 'YouTube'
         TIKTOK = 'tiktok', 'TikTok'
+        GITHUB = 'github', 'GitHub'
 
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     type = models.CharField(max_length=32, choices=Type.choices, default=Type.GENERIC)
