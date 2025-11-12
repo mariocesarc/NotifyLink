@@ -4,7 +4,7 @@ from core.models import User, SubscriptionPlan, SubscriptionPayment
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'date_joined', 'is_staff', 'is_superuser')
+    list_display = ('username', 'email', 'current_plan', 'date_joined', 'is_staff', 'is_superuser')
     exclude = ('password',)
     search_fields = ('username', 'email')
 
