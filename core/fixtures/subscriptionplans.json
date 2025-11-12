@@ -1,0 +1,24 @@
+[
+  {
+    "model": "core.subscriptionplan",
+    "pk": "00000000-0000-0000-0000-000000000001",
+    "fields": {
+      "name": "Free",
+      "description": "Tu página personal\r\nAnalítica\r\n200 Notificaciones",
+      "price": "0.00",
+      "billing_cycle": "mensual",
+      "active": true
+    }
+  },
+  {
+    "model": "core.subscriptionplan",
+    "pk": "00000000-0000-0000-0000-000000000002",
+    "fields": {
+      "name": "Premium",
+      "description": "Tu página personal\r\nAnalítica\r\nNotificaciones ilimitadas",
+      "price": "999.00",
+      "billing_cycle": "mensual",
+      "active": false
+    }
+  }
+]
