@@ -1,3 +1,5 @@
+import uuid
+
 from colorfield.fields import ColorField
 from django.conf import settings
 from django.db import models, transaction
@@ -29,7 +31,7 @@ class PageTheme(models.Model):
         NORMAL = 'p-4', 'Normal'
         TALL = 'p-6', 'Tall'
 
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True)
 
     blur_behind_bio = models.BooleanField(default=True)
@@ -48,6 +50,11 @@ class PageTheme(models.Model):
     link_text_color = ColorField(default='#ffffff')
     link_font_family = models.CharField(max_length=64, choices=FontFamily.choices, default=FontFamily.SPACE_GROTESK)
 
+    @classmethod
+    def get_default(cls):
+        theme, _ = cls.objects.get_or_create(name='Flat Dark')
+        return theme
+
     def __str__(self):
         return self.name
 
@@ -62,6 +69,7 @@ class Link(models.Model):
         TIKTOK = 'tiktok', 'TikTok'
         GITHUB = 'github', 'GitHub'
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     type = models.CharField(max_length=32, choices=Type.choices, default=Type.GENERIC)
     name = models.CharField(max_length=255)

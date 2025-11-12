@@ -5,6 +5,7 @@ from links.models import Link
 
 
 class LinkClick(models.Model):
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     link = models.ForeignKey(to=Link, on_delete=models.CASCADE)
     click_count = models.PositiveIntegerField(default=1)
