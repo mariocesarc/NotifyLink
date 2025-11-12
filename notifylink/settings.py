@@ -24,13 +24,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^+dh4_buw6jt85133^4jrwvzb#_#u=ki&e2@+&syn_mom#*=g6'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    domain = os.environ.get('DOMAIN_NAME')
+    ALLOWED_HOSTS = [domain, 'www.{}'.format(domain)]
+    CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
+    CSRF_COOKIE_DOMAIN = os.environ.get('CSRF_COOKIE_DOMAIN')
 
 AUTH_USER_MODEL = 'core.User'
 
@@ -156,7 +162,7 @@ else:
 
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/public"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/public/"
 
     STATICFILES_STORAGE = 'notifylink.storages.StaticStorage'
     DEFAULT_FILE_STORAGE = 'notifylink.storages.PublicMediaStorage'
