@@ -1,0 +1,32 @@
+<div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+    <div class="flex items-start space-x-3">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+        <div class="flex-1">
+            <h4 class="text-sm font-medium text-blue-800 mb-2">Conectar al Bot de NotifyLink</h4>
+            <ol class="text-xs text-blue-700 space-y-1 mb-3">
+                <li>1. Haz clic en el botón de abajo para abrir Telegram</li>
+                <li>2. Envía <code class="bg-blue-100 px-1 rounded">/start</code> al bot (el código de verificación se incluirá automáticamente)</li>
+                <li>3. Tu cuenta se conectará automáticamente</li>
+            </ol>
+            <div class="flex gap-2">
+                <a href="https://t.me/{{ bot_username }}?start={{ verification_code }}" 
+                   target="_blank"
+                   class="inline-flex items-center px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0011.944 0zM8.5 18.5L7 17l5-5-5-5 1.5-1.5L15 12l-6.5 6.5z"/>
+                    </svg>
+                    Abrir Bot de Telegram
+                </a>
+                <button hx-post="/config/telegram/check/" 
+                        hx-vals='{"code": "{{ verification_code }}"}'
+                        hx-target="#telegram-instructions"
+                        hx-trigger="click"
+                        class="px-3 py-1 text-xs bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                    Verificar Conexión
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

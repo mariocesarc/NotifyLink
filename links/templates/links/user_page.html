@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.display_name|default:user.username }}</title>
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&family=Lora:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: {{ page_theme.background_color }};
+            color: {{ page_theme.text_color }};
+            font-family: "{{ page_theme.font_family }}", sans-serif;
+            {% if page_theme.background_image %}
+            background-image: url('{{ page_theme.background_image.url }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            {% endif %}
+        }
+        
+        .link-item {
+            background-color: {{ page_theme.link_background_color }};
+            color: {{ page_theme.link_text_color }};
+            border: 2px solid {{ page_theme.link_outline_color }};
+            border-radius: {{ page_theme.link_roundness }};
+            font-family: "{{ page_theme.link_font_family }}", sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .link-item:hover {
+            background-color: {{ page_theme.link_hover_color }};
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .profile-container {
+            {% if page_theme.background_image and page_theme.blur_behind_bio %}
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            {% endif %}
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-lg">
+        <!-- Profile Section -->
+        <div class="profile-container rounded-2xl p-6 mb-8 text-center">
+            <!-- Avatar -->
+            <div class="mb-4">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.display_name|default:user.username }}" 
+                         class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto object-cover border-4 shadow-lg"
+                         style="border-color: {{ page_theme.avatar_outline_color }};">
+                {% else %}
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto flex items-center justify-center text-2xl sm:text-4xl font-bold shadow-lg"
+                         style="background-color: {{ page_theme.link_background_color }}; border: 4px solid {{ page_theme.avatar_outline_color }};">
+                        {{ user.display_name|default:user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Display Name / Username -->
+            <h1 class="text-xl sm:text-2xl font-bold mb-2">
+                {{ user.display_name|default:user.username }}
+            </h1>
+            
+            <!-- Username (if display_name exists) -->
+            {% if user.display_name %}
+                <p class="text-sm sm:text-base opacity-80 mb-3">@{{ user.username }}</p>
+            {% endif %}
+            
+            <!-- Bio -->
+            {% if user.bio %}
+                <p class="text-sm sm:text-base leading-relaxed opacity-90 max-w-xs mx-auto whitespace-pre-line">
+                    {{ user.bio }}
+                </p>
+            {% endif %}
+        </div>
+        
+        <!-- Links Section -->
+        <div class="space-y-4">
+            {% for link in links %}
+                <a href="{{ link.link }}" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   data-link-id="{{ link.id }}"
+                   class="link-item block w-full {{ page_theme.link_height }} text-center font-medium text-base sm:text-lg no-underline">
+                    <div class="flex items-center justify-center space-x-3">
+                        <!-- Link Icon -->
+                        <div class="flex-shrink-0">
+                            <img src="{{ link.icon_url }}" alt="{{ link.type|title }}" class="h-5 sm:h-6 max-w-6 object-contain">
+                        </div>
+                        
+                        <!-- Link Name -->
+                        <span class="flex-1 truncate">{{ link.name }}</span>
+                        
+                        <!-- External Link Icon -->
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="text-center py-12 opacity-70">
+                    <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.1m0 0l4-4a4 4 0 105.656-5.656l-1.1 1.102m-2.598 2.598a4 4 0 01-5.656 0"></path>
+                    </svg>
+                    <p class="text-lg">Aún no hay links</p>ú
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-12 pt-8 opacity-60">
+            <p class="text-xs text-gray-100 sm:text-sm inline-block px-3 py-1 rounded-full backdrop-blur-sm bg-black bg-opacity-70">
+                Created with NotifyLink
+            </p>
+        </div>
+    </div>
+    
+    <!-- Mobile optimization and accessibility -->
+    <script>
+        // Add click tracking functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.link-item').forEach(item => {
+                // Add click feedback for mobile
+                item.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                item.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+                
+                // Add click tracking
+                item.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent immediate redirect
+                    
+                    const linkId = this.getAttribute('data-link-id');
+                    const targetUrl = this.getAttribute('href');
+                    
+                    // Send click tracking request
+                    fetch(`/analytics/click/${linkId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken') || ''
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Redirect to the actual link after successful tracking
+                            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                        } else {
+                            // If tracking fails, still redirect to maintain user experience
+                            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Click tracking error:', error);
+                        // If request fails, still redirect to maintain user experience
+                        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                    });
+                });
+            });
+            
+            // Preload icons for better performance
+            const icons = document.querySelectorAll('.link-item img[src*="icons/"]');
+            icons.forEach(icon => {
+                const img = new Image();
+                img.src = icon.src;
+            });
+        });
+        
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

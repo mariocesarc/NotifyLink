@@ -1,0 +1,334 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Editar Perfil - {{ user.display_name|default:user.username }}</title>
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        // Configure HTMX to include CSRF token in all requests
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.addEventListener('htmx:configRequest', function(evt) {
+                // Try to get CSRF token from form input or meta tag
+                const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfInput ? csrfInput.value : (csrfMeta ? csrfMeta.getAttribute('content') : null);
+                
+                if (csrfToken) {
+                    evt.detail.headers['X-CSRFToken'] = csrfToken;
+                }
+            });
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&family=Lora:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .htmx-request {
+            opacity: 0.5;
+        }
+        .htmx-indicator {
+            display: none;
+        }
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+        
+        /* Status indicators */
+        .status-saved {
+            color: #10B981;
+        }
+        .status-saving {
+            color: #F59E0B;
+        }
+        
+    </style>
+</head>
+<body class="bg-gradient-to-br from-primary-lightlight via-gray-500 to-black text-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="flex justify-between items-center px-8 py-4 bg-gray-950/70 backdrop-blur-sm border-b border-primary-light/20">
+        <h1 class="text-4xl font-extrabold text-gray-300 tracking-tight">NotifyLink</h1>
+        <div class="flex items-center gap-4">
+            <a href="/{{ user.username }}" 
+               class="px-4 py-2 bg-gray-600/80 hover:bg-gray-600 text-white rounded-lg font-medium transition flex items-center gap-2">
+               🔗 Ver Página Pública
+            </a>
+            <a href="{% url 'dashboard' %}"
+               class="px-4 py-2 bg-primary/80 hover:bg-primary text-white rounded-lg font-medium transition flex items-center gap-2">
+               📊 Analytics
+            </a>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg font-medium transition">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-8">
+            <!-- Editor Panel -->
+            <div class="lg:col-span-4 bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
+                    <!-- Left Column: Profile Information -->
+                    <div class="space-y-6">
+                        <!-- Profile Information -->
+                        <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Información del Perfil</h2>
+                    
+                    <form hx-post="/config/profile/update/" 
+                          hx-target="#preview-container" 
+                          hx-encoding="multipart/form-data"
+                          hx-trigger="submit"
+                          hx-indicator="#save-indicator"
+                          class="space-y-4">
+                        {% csrf_token %}
+                        
+                        <!-- Display Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre para mostrar</label>
+                            <input type="text" 
+                                   name="display_name" 
+                                   value="{{ user.display_name }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                                   placeholder="Nombre para mostrar">
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                            <textarea name="bio" 
+                                      rows="3" 
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-800"
+                                      placeholder="Cuéntanos sobre ti...">{{ user.bio }}</textarea>
+                        </div>
+                        
+                        <!-- Avatar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto de Perfil</label>
+                            <div class="relative">
+                                <input type="file" 
+                                       name="avatar" 
+                                       accept="image/*"
+                                       id="avatar-input"
+                                       class="sr-only"
+                                       style="display: none;">
+                                <label for="avatar-input" class="w-full px-3 py-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 bg-white text-gray-800 cursor-pointer flex items-center justify-between hover:bg-gray-50 transition-colors">
+                                    <span id="file-name" class="text-gray-500">Seleccionar archivo...</span>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                </label>
+                            </div>
+                            <script>
+                                document.getElementById('avatar-input').addEventListener('change', function(e) {
+                                    const fileName = e.target.files[0]?.name || 'Seleccionar archivo...';
+                                    document.getElementById('file-name').textContent = fileName;
+                                });
+                            </script>
+                            {% if user.avatar %}
+                                <div class="flex items-center justify-between mt-1">
+                                    <p class="text-xs text-gray-600">Actual: {{ user.avatar.name }}</p>
+                                    <button type="button"
+                                            hx-post="/config/profile/update/"
+                                            hx-vals='{"clear_avatar": "true"}'
+                                            hx-target="#preview-container"
+                                            class="text-xs text-red-600 hover:text-red-800">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Save Button -->
+                        <div class="flex items-center justify-between pt-4">
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
+                                Guardar Cambios
+                            </button>
+                            <div id="save-indicator" class="htmx-indicator">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Guardando...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Page Theme -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tema de Página</label>
+                            <select name="theme_id" 
+                                    hx-post="/config/profile/update/"
+                                    hx-target="#preview-container"
+                                    hx-trigger="change"
+                                    hx-include="[name='display_name'], [name='bio'], [name='theme_id']"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
+                                {% for theme in themes %}
+                                    <option value="{{ theme.id }}" {% if theme.id == user.page_theme.id %}selected{% endif %}>
+                                        {{ theme.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Notifications Toggle -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Configuración de Notificaciones</label>
+                            <div class="flex items-center justify-between p-3 border border-gray-300 rounded-md bg-gray-50">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">Notificaciones de Clics</span>
+                                    <p class="text-xs text-gray-600">Recibe notificaciones cuando alguien haga clic en tus enlaces</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" 
+                                           name="notifications_enabled" 
+                                           value="1"
+                                           {% if user.notifications_enabled %}checked{% endif %}
+                                           hx-post="/config/profile/update/"
+                                           hx-target="#preview-container"
+                                           hx-trigger="change"
+                                           hx-include="[name='display_name'], [name='bio'], [name='theme_id'], [name='notifications_enabled']"
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Telegram Integration -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Integración con Telegram</label>
+                            {% if user.telegram_chat_id %}
+                                <!-- Already connected -->
+                                <div class="flex items-center justify-between p-3 border border-green-300 rounded-md bg-green-50">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="text-sm font-medium text-green-800">Telegram Conectado</span>
+                                            <p class="text-xs text-green-600">Recibirás notificaciones por Telegram</p>
+                                        </div>
+                                    </div>
+                                    <button hx-post="/config/telegram/disconnect/" 
+                                            hx-confirm="¿Estás seguro de que quieres desconectar las notificaciones de Telegram?"
+                                            class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700">
+                                        Desconectar
+                                    </button>
+                                </div>
+                            {% else %}
+                                <!-- Not connected -->
+                                <div class="p-3 border border-gray-300 rounded-md bg-gray-50">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-800">Conectar Bot de Telegram</span>
+                                            <p class="text-xs text-gray-600">Recibe notificaciones cuando alguien haga clic en tus enlaces</p>
+                                        </div>
+                                        <button id="connect-telegram-btn" 
+                                                hx-post="/config/telegram/connect/" 
+                                                hx-target="#telegram-instructions"
+                                                class="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            Conectar
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Instructions will appear here -->
+                                    <div id="telegram-instructions" class="mt-3"></div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Success Message -->
+                        <div id="save-success" class="hidden">
+                            <div class="flex items-center text-sm text-green-600 bg-green-50 p-3 rounded-md">
+                                <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                ¡Perfil guardado exitosamente!
+                            </div>
+                        </div>
+                    </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Links Management -->
+                    <div class="space-y-6">
+                        <!-- Links Management -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Links</h2>
+                        <p class="text-sm text-gray-600">Los cambios se guardan automáticamente</p>
+                    </div>
+                    
+                    <!-- Add New Link Form -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">Agregar Nuevo Link</h3>
+                        <form hx-post="/config/links/add/" 
+                              hx-target="#links-list"
+                              hx-swap="innerHTML"
+                              hx-on::after-request="this.reset()"
+                              class="space-y-3">
+                            {% csrf_token %}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <input type="text" 
+                                       name="name" 
+                                       placeholder="Nombre del link"
+                                       required
+                                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
+                                <input type="text" 
+                                       name="url" 
+                                       placeholder="example.com o https://example.com" 
+                                       required
+                                       pattern="^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$"
+                                       title="Por favor ingresa una URL válida (ej. example.com o https://example.com)"
+                                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
+                            </div>
+                            <div class="flex gap-3">
+                                <select name="type" 
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
+                                    <option value="generic">Genérico</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="github">GitHub</option>
+                                </select>
+                                <button type="submit" 
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Agregar Link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Links List -->
+                    <div id="links-list">
+                        {% include 'links/partials/links_list.html' %}
+                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="lg:col-span-2 lg:sticky lg:top-8 lg:h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center lg:text-left">Vista Previa</h2>
+
+                <!-- Container que ocupa ancho completo en desktop y centrado en móvil -->
+                <div class="w-full flex justify-center lg:block">
+                    <div class="border-2 border-primary-light/30 rounded-lg overflow-hidden bg-white shadow-2xl h-[800px] w-full max-w-[390px] mx-auto">
+                        <div id="preview-container" class="overflow-y-auto">
+                            {% include 'links/partials/preview.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

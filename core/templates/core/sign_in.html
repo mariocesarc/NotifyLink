@@ -1,0 +1,90 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In - NotifyLink</title>
+
+  <!-- Tailwind -->
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-br from-primary-dark via-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="flex justify-between items-center px-8 py-4 bg-gray-950/70 backdrop-blur-sm border-b border-primary-light/20">
+      <a href="{% url 'main_page' %}" class="text-4xl font-extrabold text-primary-light tracking-tight">NotifyLink</a>
+      <div class="flex items-center gap-4">
+        <a href="{% url 'sign_up' %}"
+           class="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg font-medium transition">
+           Sign up
+        </a>
+      </div>
+  </header>
+
+  <!-- Sign In Form -->
+  <main class="flex-1 flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+      <div class="bg-gray-900/60 rounded-3xl p-8 border border-primary-light/20 shadow-2xl">
+        <h2 class="text-3xl font-bold text-center text-white mb-8">Iniciar sesión</h2>
+        
+        {% if error %}
+          <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-6" id="error-message">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="text-red-700 text-sm">{{ error }}</span>
+            </div>
+          </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'sign_in' %}" class="space-y-6">
+          {% csrf_token %}
+          
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-200 mb-2">
+              Username
+            </label>
+            <input type="text" id="username" name="username" required
+                   value="{{ username|default:'' }}"
+                   class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                   placeholder="Tu username">
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-200 mb-2">
+              Contraseña
+            </label>
+            <input type="password" id="password" name="password" required
+                   class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                   placeholder="Tu contraseña">
+          </div>
+
+          <button type="submit"
+                  class="w-full px-6 py-3 bg-primary hover:bg-primary-light text-white text-lg font-semibold rounded-xl shadow-lg transition transform hover:scale-105">
+            Iniciar sesión
+          </button>
+        </form>
+
+        <div class="text-center mt-6">
+          <p class="text-gray-400">
+            ¿No tienes cuenta? 
+            <a href="{% url 'sign_up' %}" class="text-primary-light hover:text-primary transition font-medium">
+              Crea una cuenta
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-sm text-gray-500 py-8 border-t border-primary-light/20">
+    © 2025 NotifyLink — Todos los derechos reservados.
+  </footer>
+
+</body>
+</html>
