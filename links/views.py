@@ -288,7 +288,7 @@ def telegram_check(request):
 def telegram_disconnect(request):
     user = request.user
     user.telegram_chat_id = ''
-    user.telegram_token = None
+    user.telegram_token = ''
     user.token_expires = None
     user.save()
 
