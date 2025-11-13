@@ -12,8 +12,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     display_name = models.CharField(max_length=64, blank=True)
     bio = models.TextField(max_length=500, blank=True)
-    page_theme = models.ForeignKey(to='PageTheme', on_delete=models.PROTECT, blank=True, null=True)
-
+    page_theme = models.ForeignKey(to='links.PageTheme', on_delete=models.PROTECT, blank=True, null=True)
     current_plan = models.ForeignKey(to='SubscriptionPlan', on_delete=models.PROTECT, blank=True, null=True)
     notifications_enabled = models.BooleanField(default=True)
     remaining_notifications = models.PositiveIntegerField(default=0)
