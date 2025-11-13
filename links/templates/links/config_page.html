@@ -125,8 +125,19 @@
                             </div>
                             <script>
                                 document.getElementById('avatar-input').addEventListener('change', function(e) {
-                                    const fileName = e.target.files[0]?.name || 'Seleccionar archivo...';
-                                    document.getElementById('file-name').textContent = fileName;
+                                    const file = e.target.files[0];
+                                    const maxSize = 5 * 1024 * 1024; // max 5MB
+                                    if (file) {
+                                        if (file.size > maxSize) {
+                                            alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+                                            this.value = '';
+                                            document.getElementById('file-name').textContent = 'Seleccionar archivo...';
+                                            return;
+                                        }
+                                        document.getElementById('file-name').textContent = file.name;
+                                    } else {
+                                        document.getElementById('file-name').textContent = 'Seleccionar archivo...';
+                                    }
                                 });
                             </script>
                             {% if user.avatar %}

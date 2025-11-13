@@ -68,7 +68,11 @@ def update_profile(request):
                 pass
         
         if 'avatar' in request.FILES:
-            user.avatar = request.FILES['avatar']
+            avatar_file = request.FILES['avatar']
+            max_size = 5 * 1024 * 1024  # max 5MB
+            if avatar_file.size > max_size:
+                return render_error_with_state(request, 'El archivo de avatar es demasiado grande. El tamaño máximo permitido es 5MB.')
+            user.avatar = avatar_file
         elif request.POST.get('clear_avatar'):
             user.avatar = None
         
