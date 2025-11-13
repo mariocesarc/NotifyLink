@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{{ user.display_name|default:user.username }}</title>
     <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&family=Lora:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -146,7 +147,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken') || ''
+                            'X-CSRFToken': getCSRFToken() || ''
                         },
                         body: JSON.stringify({})
                     })
@@ -175,6 +176,18 @@
                 img.src = icon.src;
             });
         });
+        
+        // Function to get CSRF token from meta tag or cookies
+        function getCSRFToken() {
+            // First try to get from meta tag
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag) {
+                return metaTag.getAttribute('content');
+            }
+            
+            // Fallback to cookie
+            return getCookie('csrftoken');
+        }
         
         // Function to get CSRF token from cookies
         function getCookie(name) {

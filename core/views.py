@@ -49,7 +49,7 @@ def sign_up(request):
         return redirect('config_page')
         
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
+        username = request.POST.get('username', '').strip().lower()
         display_name = request.POST.get('display_name', '').strip()
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')

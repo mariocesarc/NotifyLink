@@ -1,39 +1,40 @@
 import json
-from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from analytics.utils import send_telegram_message
 
 User = get_user_model()
 
 
+@require_POST
 @csrf_exempt
 def telegram_webhook(request):
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body or '{}')
+    except Exception:
+        return JsonResponse({'ok': False})
 
-    if 'message' in data:
-        chat_id = data['message']['chat']['id']
-        text = data['message'].get('text', '')
+    message = data.get('message')
+    # ignore if there is no message
+    if not isinstance(message, dict):
+        return JsonResponse({'ok': True})
 
-        if text.startswith('/start '):
-            token = text.split(' ', 1)[1]
+    text = message.get('text', '')
+    chat_id = (message.get('chat') or {}).get('id')
 
-            user = User.objects.get(
-                telegram_token=token,
-                token_expires__gt=datetime.now()
-            )
-
-            # connect the account
-            user.telegram_chat_id = str(chat_id)
-            user.telegram_token = None
+    if text.startswith('/start '):
+        token = text.split(' ', 1)[1]
+        user = User.objects.filter(telegram_token=token, token_expires__gt=timezone.now()).first()
+        if user:
+            user.telegram_chat_id = str(chat_id) if chat_id else ''
+            user.telegram_token = ''
             user.token_expires = None
             user.save()
+            send_telegram_message(user, 'vinculado correctamente!')
 
-            send_telegram_message(user, 'Vinculado correctamente!')
-
-            return JsonResponse({'ok': True})
-
-    return JsonResponse({'ok': False})
+    return JsonResponse({'ok': True})

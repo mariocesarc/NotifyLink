@@ -14,7 +14,7 @@ For those who still get a dopamine hit every time they get attention.
 
 - **(Almost) SaaS ready** - Custom user model with some subscription logic and landing page with plan descriptions
 - **Database driven page themes** - Themes are stored as database models, making them easily manageable by admins. Users select from available theme presets
-- **User config page** - Write a bio, change page theme, add/remove/reorder links and define link types. Implemented with htmx
+- **User page editor** - Write a bio, change page theme, add/remove/reorder links and define link types. Implemented with htmx
 - **Analytics** - Track clicks
 - **Telegram notifications** - Get instant notifications when someone clicks your links
 - **AWS S3 Integration** - Production ready file storage for user uploads
