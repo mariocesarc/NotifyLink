@@ -146,6 +146,7 @@ USE_TZ = True
 if DEBUG:
     
     STATIC_URL = '/static/'
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
     STATICFILES_DIRS = [BASE_DIR / 'static']
     
     MEDIA_URL = '/media/'
@@ -162,6 +163,7 @@ else:
 
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/public/"
 
     STATICFILES_STORAGE = 'notifylink.storages.StaticStorage'
