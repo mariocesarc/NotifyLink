@@ -159,15 +159,42 @@ else:
 
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
-    AWS_QUERYSTRING_AUTH = False
+
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'region_name': AWS_S3_REGION_NAME,
+                'default_acl': 'public-read',
+                'location': 'media/public',
+                'file_overwrite': False,
+            },
+        },
+        'private_media': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'region_name': AWS_S3_REGION_NAME,
+                'default_acl': 'private',
+                'location': 'media/private',
+                'file_overwrite': False,
+            },
+        },
+        'staticfiles': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'region_name': AWS_S3_REGION_NAME,
+                'default_acl': 'public-read',
+                'location': 'static',
+            },
+        },
+    }
 
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/public/"
-
-    STATICFILES_STORAGE = 'notifylink.storages.StaticStorage'
-    DEFAULT_FILE_STORAGE = 'notifylink.storages.PublicMediaStorage'
 
 
 # Default primary key field type
