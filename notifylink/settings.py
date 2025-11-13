@@ -198,5 +198,46 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+
+GOOGLE_CHAT_WEBHOOK = os.getenv('GOOGLE_CHAT_WEBHOOK')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {funcName} {lineno} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'google_chat': {
+            '()': 'notifylink.logging_handlers.GoogleChatHandler',
+            'webhook_url': GOOGLE_CHAT_WEBHOOK,
+            'level': 'WARNING',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['google_chat'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['google_chat'],
+            'level': 'WARNING',  # 4xx/5xx errors
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['google_chat'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['google_chat'],
+        'level': 'WARNING',
+    },
+}

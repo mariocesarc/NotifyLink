@@ -59,6 +59,8 @@ DB_USER=
 DB_PASSWORD=
 DB_HOST=
 DB_PORT=
+
+GOOGLE_CHAT_WEBHOOK=
 ```
 
 ## Future Work
