@@ -12,11 +12,14 @@ def get_client_ip(request):
 
 
 def send_telegram_message(user, message):
-    url = 'https://api.telegram.org/bot{}/sendMessage'.format(settings.TELEGRAM_BOT_TOKEN)
-    data = {
-        'chat_id': user.telegram_chat_id,
-        'text': message,
-        'parse_mode': 'HTML'
-    }
-    response = requests.post(url, data=data)
-    return response.status_code == 200
+    if user.telegram_chat_id:
+        url = 'https://api.telegram.org/bot{}/sendMessage'.format(settings.TELEGRAM_BOT_TOKEN)
+        data = {
+            'chat_id': user.telegram_chat_id,
+            'text': message,
+            'parse_mode': 'HTML'
+        }
+        response = requests.post(url, data=data)
+        return response.status_code == 200
+    else:
+        return False

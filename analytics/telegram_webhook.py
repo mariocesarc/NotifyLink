@@ -32,7 +32,7 @@ def telegram_webhook(request):
             user.token_expires = None
             user.save()
 
-            send_telegram_message(user, "Vinculado correctamente!")
+            send_telegram_message(user, 'Vinculado correctamente!')
 
             return JsonResponse({'ok': True})
 
