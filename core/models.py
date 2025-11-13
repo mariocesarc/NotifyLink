@@ -7,7 +7,6 @@ from django.db import models
 class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=16, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     display_name = models.CharField(max_length=64, blank=True)
