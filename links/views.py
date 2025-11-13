@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST
 
 from links.models import Link, PageTheme
@@ -28,6 +29,7 @@ def get_user_page(request, username):
     return render(request, 'links/user_page.html', context)
 
 
+@never_cache
 @login_required
 @require_GET
 def config_page(request):
