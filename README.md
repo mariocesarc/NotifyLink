@@ -30,7 +30,7 @@ For those who still get a dopamine hit every time they get attention.
 
 #### Quick Start
 ```bash
-git clone https://github.com/yourusername/notifylink.git
+git clone https://github.com/mariocesarc/NotifyLink.git
 cd notifylink
 pip install -r requirements.txt
 python manage.py makemigrations
