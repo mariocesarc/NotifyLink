@@ -1,8 +1,7 @@
 # NotifyLink
 
-*A (not so healthy) clone of Linktree*
-
-**Get notified every time someone clicks one of your links.**
+*A (not so healthy) clone of Linktree*  
+**Get notified every time someone clicks one of your links.**  
 For those who still get a dopamine hit every time they get attention.
 
 ![Demo](demo.gif)
