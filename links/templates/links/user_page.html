@@ -137,12 +137,8 @@
                 
                 // Add click tracking
                 item.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent immediate redirect
-                    
                     const linkId = this.getAttribute('data-link-id');
-                    const targetUrl = this.getAttribute('href');
-                    
-                    // Send click tracking request
+                    // Send click tracking request asynchronously
                     fetch(`/analytics/click/${linkId}/`, {
                         method: 'POST',
                         headers: {
@@ -150,21 +146,8 @@
                             'X-CSRFToken': getCSRFToken() || ''
                         },
                         body: JSON.stringify({})
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Redirect to the actual link after successful tracking
-                            window.open(targetUrl, '_blank', 'noopener,noreferrer');
-                        } else {
-                            // If tracking fails, still redirect to maintain user experience
-                            window.open(targetUrl, '_blank', 'noopener,noreferrer');
-                        }
-                    })
-                    .catch(error => {
+                    }).catch(error => {
                         console.error('Click tracking error:', error);
-                        // If request fails, still redirect to maintain user experience
-                        window.open(targetUrl, '_blank', 'noopener,noreferrer');
                     });
                 });
             });
