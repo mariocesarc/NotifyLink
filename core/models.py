@@ -4,9 +4,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
-
+class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        abstract = True
+
+
+class User(AbstractUser, BaseModel):
+
     phone = models.CharField(max_length=16, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     display_name = models.CharField(max_length=64, blank=True)
@@ -37,9 +43,8 @@ class User(AbstractUser):
         return self.username
 
 
-class SubscriptionPlan(models.Model):
+class SubscriptionPlan(BaseModel):
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, unique=True)
     description = models.TextField(blank=True)
     max_notifications = models.PositiveIntegerField(default=200)
@@ -56,7 +61,7 @@ class SubscriptionPlan(models.Model):
         return self.name
 
 
-class SubscriptionPayment(models.Model):
+class SubscriptionPayment(BaseModel):
 
     class Status(models.TextChoices):
         PENDING = 'pending', 'pending'
@@ -64,7 +69,6 @@ class SubscriptionPayment(models.Model):
         FAILED = 'failed', 'failed'
         REFUNDED = 'refunded', 'refunded'
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(to=User, on_delete=models.PROTECT)
     plan = models.ForeignKey(to=SubscriptionPlan, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=8, decimal_places=2)

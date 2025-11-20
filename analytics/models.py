@@ -1,12 +1,10 @@
-import uuid
-
 from django.db import models
 from links.models import Link
+from core.models import BaseModel
 
 
-class LinkClick(models.Model):
+class LinkClick(BaseModel):
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     link = models.ForeignKey(to=Link, on_delete=models.CASCADE)
     click_count = models.PositiveIntegerField(default=1)
     ip_address = models.GenericIPAddressField()
@@ -17,13 +15,12 @@ class LinkClick(models.Model):
         ordering = ['-timestamp']
 
 
-class ClickNotification(models.Model):
+class ClickNotification(BaseModel):
 
     class Type(models.TextChoices):
         TELEGRAM = 'telegram', 'Telegram'
         WHATSAPP = 'whatsapp', 'Whatsapp'
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.CharField(max_length=32, choices=Type.choices, default=Type.TELEGRAM)
     link = models.ForeignKey(to=Link, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
